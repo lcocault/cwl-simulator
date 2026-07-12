@@ -7,7 +7,8 @@ Simulator of CWL workflows.
 The repository includes runnable sample inputs in `examples/`:
 
 - `resources.json`: two hosts and one shared SSD storage device
-- `workflow.cwl`: a three-step workflow that includes a scatter stage
+- `workflow.cwl`: a three-step parent workflow that references sub-workflows
+- `stage-inputs.cwl`, `align-samples.cwl`, `summarize-results.cwl`: sub-workflow definitions used by `workflow.cwl`
 - `failure_scenarios.json`: a recovery scenario triggered on the scattered step
 
 ## Usage
