@@ -1,0 +1,2 @@
+cwl-utils>=0.36
+PyYAML>=6.0
