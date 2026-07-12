@@ -16,7 +16,7 @@ except ImportError:  # pragma: no cover - optional runtime dependency guard
     load_document_by_uri = None
     ValidationException = ValueError
 
-BITS_PER_BYTE = 8.0
+BITS_TO_BYTES_DIVISOR = 8.0
 GB_TO_MB_DECIMAL = 1000.0
 MB_PER_GIB = 1024.0
 RAM_WORKLOAD_FACTOR = 0.1
@@ -117,7 +117,7 @@ def _scatter_count(step_data: dict[str, Any]) -> int:
         return explicit
     scatter = step_data.get("scatter")
     if isinstance(scatter, list):
-        return max(2, len(scatter))
+        return max(1, len(scatter))
     return 2
 
 
@@ -127,7 +127,7 @@ def _duration(host: dict[str, Any], storage: dict[str, Any], req: dict[str, floa
     ram_component = req["workload"] / max(float(host["ram_gb"]) * RAM_WORKLOAD_FACTOR, 0.001)
     disk_component = req["input_data_size_gb"] / max(float(storage["read_speed_mbps"]) / GB_TO_MB_DECIMAL, 0.001)
     network_component = req["input_data_size_gb"] * GB_TO_MB_DECIMAL / max(
-        float(host["network_bandwidth_mbps"]) / BITS_PER_BYTE, 0.001
+        float(host["network_bandwidth_mbps"]) / BITS_TO_BYTES_DIVISOR, 0.001
     )
     network_component += float(host.get("network_latency_ms", 0.0)) / 1000.0
     return max(cpu_component + ram_component + disk_component + network_component, 0.01)
@@ -353,7 +353,7 @@ def simulate(
                         "disk_io_mbps": round(
                             min(
                                 float(storage["read_speed_mbps"]),
-                                req["input_data_size_gb"] * GB_TO_MB_DECIMAL * BITS_PER_BYTE / duration,
+                                req["input_data_size_gb"] * GB_TO_MB_DECIMAL * BITS_TO_BYTES_DIVISOR / duration,
                             ),
                             2,
                         ),
