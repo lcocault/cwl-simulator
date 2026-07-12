@@ -114,8 +114,9 @@ steps:
             random_seed=7,
         )
 
-        scatter_items = [item for item in results["activities"] if item["id"].startswith("process-scatter-")]
+        scatter_items = [item for item in results["activities"] if item.get("scatter_index") is not None]
         self.assertEqual(len(scatter_items), 3)
+        self.assertEqual({item["scatter_index"] for item in scatter_items}, {1, 2, 3})
         host_ids = {item["host_id"] for item in scatter_items}
         self.assertGreaterEqual(len(host_ids), 1)
 

@@ -15,7 +15,7 @@ except Exception:  # pragma: no cover - optional runtime dependency guard
     load_document_by_uri = None
 
 BITS_PER_BYTE = 8.0
-GB_TO_MB = 1000.0
+GB_TO_MB_DECIMAL = 1000.0
 
 
 def _load_json(path: str | Path) -> dict[str, Any]:
@@ -331,6 +331,8 @@ def simulate(
                     "status": "completed",
                     "failure_mode": "none",
                 }
+                if scatter_count > 1:
+                    record["scatter_index"] = index + 1
                 shard_records.append(record)
                 activities.append(record)
 
@@ -341,7 +343,13 @@ def simulate(
                         "timestamp_seconds": round(start, 4),
                         "cpu_utilization_percent": round(min((req["cpu_cores"] / float(host["cpu_cores"])) * 100.0, 100.0), 2),
                         "ram_utilization_percent": round(min((req["ram_gb"] / float(host["ram_gb"])) * 100.0, 100.0), 2),
-                        "disk_io_mbps": round(min(float(storage["read_speed_mbps"]), req["input_data_size_gb"] * GB_TO_MB / duration), 2),
+                        "disk_io_mbps": round(
+                            min(
+                                float(storage["read_speed_mbps"]),
+                                req["input_data_size_gb"] * GB_TO_MB_DECIMAL * BITS_PER_BYTE / duration,
+                            ),
+                            2,
+                        ),
                         "network_io_mbps": round(min(float(host["network_bandwidth_mbps"]), req["network_mbps"]), 2),
                     }
                 )
@@ -401,7 +409,7 @@ def simulate(
 
     results = {
         "simulation_metadata": {
-            "timestamp": dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+            "timestamp": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
             "total_duration_seconds": round(total_duration, 4),
             "scenario": scenario_name,
         },
