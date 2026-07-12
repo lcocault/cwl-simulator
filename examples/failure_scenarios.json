@@ -1,0 +1,7 @@
+[
+  {
+    "trigger_activity_id": "align-samples",
+    "failure_mode": "network_saturation",
+    "recovery_activity_id": "align-samples-recovery"
+  }
+]

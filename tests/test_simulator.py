@@ -145,6 +145,27 @@ steps:
         self.assertTrue(any(item["id"] == "process-recovery" for item in results["activities"]))
         self.assertTrue(results["failure_scenarios"])
 
+    def test_repository_examples_simulate_failure_recovery(self):
+        examples_dir = Path(__file__).resolve().parents[1] / "examples"
+
+        results = simulate(
+            resources_json_path=str(examples_dir / "resources.json"),
+            cwl_workflow_paths=[str(examples_dir / "workflow.cwl")],
+            failure_scenarios=json.loads((examples_dir / "failure_scenarios.json").read_text(encoding="utf-8")),
+            failure_probability=1.0,
+            output_directory=str(self.work_dir),
+            random_seed=7,
+        )
+
+        self.assertEqual(results["simulation_metadata"]["scenario"], "failure_recovery")
+        self.assertTrue((self.work_dir / "simulation_results.json").exists())
+        self.assertTrue((self.work_dir / "simulation_report.html").exists())
+        self.assertEqual(
+            len([item for item in results["activities"] if item["id"].startswith("align-samples-scatter-")]),
+            3,
+        )
+        self.assertTrue(any(item["id"] == "align-samples-recovery" for item in results["activities"]))
+
 
 if __name__ == "__main__":
     unittest.main()
