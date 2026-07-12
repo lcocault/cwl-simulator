@@ -4,6 +4,8 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+import yaml
+
 from simulator import simulate
 
 
@@ -165,6 +167,20 @@ steps:
             3,
         )
         self.assertTrue(any(item["id"] == "align-samples-recovery" for item in results["activities"]))
+
+    def test_example_subworkflow_references_exist(self):
+        examples_dir = Path(__file__).resolve().parents[1] / "examples"
+        workflow = yaml.safe_load((examples_dir / "workflow.cwl").read_text(encoding="utf-8"))
+        steps = workflow.get("steps", {})
+
+        for step in steps.values():
+            run_target = step.get("run")
+            self.assertIsNotNone(run_target, "Each example workflow step must define a run target")
+            if isinstance(run_target, str) and run_target.endswith(".cwl"):
+                subworkflow_path = examples_dir / run_target
+                self.assertTrue(subworkflow_path.exists(), f"Missing referenced file: {run_target}")
+                subworkflow = yaml.safe_load(subworkflow_path.read_text(encoding="utf-8"))
+                self.assertEqual(subworkflow.get("class"), "Workflow")
 
 
 if __name__ == "__main__":
