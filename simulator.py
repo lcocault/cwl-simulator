@@ -14,6 +14,9 @@ try:
 except Exception:  # pragma: no cover - optional runtime dependency guard
     load_document_by_uri = None
 
+BITS_PER_BYTE = 8.0
+GB_TO_MB = 1000.0
+
 
 def _load_json(path: str | Path) -> dict[str, Any]:
     with Path(path).open("r", encoding="utf-8") as handle:
@@ -119,7 +122,7 @@ def _duration(host: dict[str, Any], storage: dict[str, Any], req: dict[str, floa
     cpu_component = req["workload"] / max(req["cpu_cores"] * cpu_speed, 0.001)
     ram_component = req["workload"] / max(float(host["ram_gb"]) * 0.1, 0.001)
     disk_component = req["input_data_size_gb"] / max(float(storage["read_speed_mbps"]) / 1000.0, 0.001)
-    network_component = req["input_data_size_gb"] / max(float(host["network_bandwidth_mbps"]) / 8.0, 0.001)
+    network_component = req["input_data_size_gb"] / max(float(host["network_bandwidth_mbps"]) / BITS_PER_BYTE, 0.001)
     network_component += float(host.get("network_latency_ms", 0.0)) / 1000.0
     return max(cpu_component + ram_component + disk_component + network_component, 0.01)
 
@@ -243,8 +246,8 @@ def _build_html_report(results: dict[str, Any]) -> str:
 
     createChart('cpuChart', 'CPU Utilization (%)', cpu, '#2563eb');
     createChart('ramChart', 'RAM Utilization (%)', ram, '#16a34a');
-    createChart('diskChart', 'Disk I/O (mbps)', disk, '#dc2626');
-    createChart('networkChart', 'Network I/O (mbps)', network, '#7c3aed');
+    createChart('diskChart', 'Disk I/O (Mbps)', disk, '#dc2626');
+    createChart('networkChart', 'Network I/O (Mbps)', network, '#7c3aed');
   </script>
 </body>
 </html>
@@ -338,7 +341,7 @@ def simulate(
                         "timestamp_seconds": round(start, 4),
                         "cpu_utilization_percent": round(min((req["cpu_cores"] / float(host["cpu_cores"])) * 100.0, 100.0), 2),
                         "ram_utilization_percent": round(min((req["ram_gb"] / float(host["ram_gb"])) * 100.0, 100.0), 2),
-                        "disk_io_mbps": round(min(float(storage["read_speed_mbps"]), req["input_data_size_gb"] * 1000.0 / duration), 2),
+                        "disk_io_mbps": round(min(float(storage["read_speed_mbps"]), req["input_data_size_gb"] * GB_TO_MB / duration), 2),
                         "network_io_mbps": round(min(float(host["network_bandwidth_mbps"]), req["network_mbps"]), 2),
                     }
                 )
