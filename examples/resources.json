@@ -1,0 +1,31 @@
+{
+  "hosts": [
+    {
+      "id": "worker-fast",
+      "cpu_cores": 16,
+      "cpu_speed_ghz": 3.2,
+      "ram_gb": 64,
+      "disk_gb": 500,
+      "network_bandwidth_mbps": 10000,
+      "network_latency_ms": 3
+    },
+    {
+      "id": "worker-standard",
+      "cpu_cores": 8,
+      "cpu_speed_ghz": 2.6,
+      "ram_gb": 32,
+      "disk_gb": 250,
+      "network_bandwidth_mbps": 2500,
+      "network_latency_ms": 12
+    }
+  ],
+  "storage_devices": [
+    {
+      "id": "shared-ssd",
+      "type": "ssd",
+      "capacity_gb": 2000,
+      "read_speed_mbps": 3500,
+      "write_speed_mbps": 2800
+    }
+  ]
+}
