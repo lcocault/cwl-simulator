@@ -243,8 +243,8 @@ def _build_html_report(results: dict[str, Any]) -> str:
 
     createChart('cpuChart', 'CPU Utilization (%)', cpu, '#2563eb');
     createChart('ramChart', 'RAM Utilization (%)', ram, '#16a34a');
-    createChart('diskChart', 'Disk I/O (Mbps)', disk, '#dc2626');
-    createChart('networkChart', 'Network I/O (Mbps)', network, '#7c3aed');
+    createChart('diskChart', 'Disk I/O (mbps)', disk, '#dc2626');
+    createChart('networkChart', 'Network I/O (mbps)', network, '#7c3aed');
   </script>
 </body>
 </html>
