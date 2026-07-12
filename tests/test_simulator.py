@@ -168,7 +168,7 @@ steps:
         )
         self.assertTrue(any(item["id"] == "align-samples-recovery" for item in results["activities"]))
 
-    def test_repository_example_workflow_references_existing_subworkflows(self):
+    def test_example_workflow_subworkflow_references_exist(self):
         examples_dir = Path(__file__).resolve().parents[1] / "examples"
         workflow = yaml.safe_load((examples_dir / "workflow.cwl").read_text(encoding="utf-8"))
         steps = workflow.get("steps", {})

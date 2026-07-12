@@ -12,7 +12,7 @@ steps:
       class: ExpressionTool
       requirements:
         InlineJavascriptRequirement: {}
-      inputs: []
+      inputs: {}
       outputs:
         prepared: string
       expression: |
