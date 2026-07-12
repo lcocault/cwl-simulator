@@ -175,6 +175,7 @@ steps:
 
         for step in steps.values():
             run_target = step.get("run")
+            self.assertIsNotNone(run_target, "Each example workflow step must define a run target")
             if isinstance(run_target, str) and run_target.endswith(".cwl"):
                 subworkflow_path = examples_dir / run_target
                 self.assertTrue(subworkflow_path.exists(), f"Missing referenced file: {run_target}")
