@@ -112,7 +112,7 @@ def _resource_requirement(step_data: dict[str, Any]) -> dict[str, float]:
 def _scatter_count(step_data: dict[str, Any]) -> int:
     if "scatter" not in step_data:
         return 1
-    explicit = step_data.get("scatter_count", step_data.get("scatterCount"))
+    explicit = step_data.get("scatter_count")
     if isinstance(explicit, int) and explicit > 0:
         return explicit
     scatter = step_data.get("scatter")
@@ -267,6 +267,7 @@ def simulate(
     failure_probability: float = 0.2,
     output_directory: str | None = None,
     random_seed: int | None = None,
+    timestamp: dt.datetime | None = None,
 ) -> dict[str, Any]:
     if random_seed is not None:
         random.seed(random_seed)
@@ -412,10 +413,11 @@ def simulate(
 
     total_duration = max((item["end_time_seconds"] for item in activities), default=0.0)
     scenario_name = "failure_recovery" if failure_records else "nominal"
+    current_time = timestamp or dt.datetime.now(dt.timezone.utc)
 
     results = {
         "simulation_metadata": {
-            "timestamp": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "timestamp": current_time.strftime("%Y-%m-%dT%H:%M:%SZ"),
             "total_duration_seconds": round(total_duration, 4),
             "scenario": scenario_name,
         },
