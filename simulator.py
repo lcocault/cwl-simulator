@@ -11,11 +11,14 @@ import yaml
 
 try:
     from cwl_utils.parser import load_document_by_uri
-except Exception:  # pragma: no cover - optional runtime dependency guard
+    from schema_salad.exceptions import ValidationException
+except ImportError:  # pragma: no cover - optional runtime dependency guard
     load_document_by_uri = None
+    ValidationException = ValueError
 
 BITS_PER_BYTE = 8.0
 GB_TO_MB_DECIMAL = 1000.0
+MB_PER_GIB = 1024.0
 RAM_WORKLOAD_FACTOR = 0.1
 
 
@@ -29,7 +32,7 @@ def _load_cwl(path: str | Path) -> dict[str, Any]:
     if load_document_by_uri is not None:
         try:
             load_document_by_uri(file_path.as_uri())
-        except Exception:
+        except (ValidationException, ValueError, OSError):
             pass
     with file_path.open("r", encoding="utf-8") as handle:
         return yaml.safe_load(handle) or {}
@@ -86,11 +89,11 @@ def _resource_requirement(step_data: dict[str, Any]) -> dict[str, float]:
         if "coresMin" in resource_requirement:
             req["cpu_cores"] = float(resource_requirement["coresMin"])
         if "ramMin" in resource_requirement:
-            req["ram_gb"] = float(resource_requirement["ramMin"]) / 1024.0
+            req["ram_gb"] = float(resource_requirement["ramMin"]) / MB_PER_GIB
 
         tmp = float(resource_requirement.get("tmpdirMin", 0.0))
         out = float(resource_requirement.get("outdirMin", 0.0))
-        disk = (tmp + out) / 1024.0
+        disk = (tmp + out) / MB_PER_GIB
         if disk > 0:
             req["disk_gb"] = disk
 
