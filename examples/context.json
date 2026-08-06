@@ -1,0 +1,7 @@
+{
+  "hosts": {
+    "stage-inputs": "worker-standard",
+    "align-samples": "worker-fast",
+    "summarize-results": "worker-standard"
+  }
+}

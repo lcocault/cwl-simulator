@@ -176,9 +176,9 @@ def _build_graph(
     return lines, entry_ids, exits_by_output
 
 
-def to_dot(workflow: dict[str, Any], full: bool) -> str:
+def to_dot(workflow: dict[str, Any], full: bool, rankdir: str = "LR") -> str:
     lines, _, _ = _build_graph(workflow, "")
-    header = ["digraph workflow {", "  rankdir=LR;"]
+    header = ["digraph workflow {", f"  rankdir={rankdir};"]
     if full:
         header.append("  compound=true;")
     return "\n".join(header + lines + ["}"])
@@ -193,10 +193,17 @@ def main() -> None:
         action="store_true",
         help="Merge sub-workflows into a temporary full workflow before rendering",
     )
+    parser.add_argument(
+        "-v",
+        "--vertical",
+        action="store_true",
+        help="Lay out the graph top-to-bottom instead of the default left-to-right",
+    )
     args = parser.parse_args()
+    rankdir = "TB" if args.vertical else "LR"
 
     if not args.full:
-        print(to_dot(_load_cwl(args.workflow), full=False))
+        print(to_dot(_load_cwl(args.workflow), full=False, rankdir=rankdir))
         return
 
     full_workflow = merge_full_workflow(args.workflow)
@@ -204,7 +211,7 @@ def main() -> None:
         yaml.safe_dump(full_workflow, temp_file)
         temp_path = temp_file.name
     try:
-        print(to_dot(_load_cwl(temp_path), full=True))
+        print(to_dot(_load_cwl(temp_path), full=True, rankdir=rankdir))
     finally:
         Path(temp_path).unlink()
 

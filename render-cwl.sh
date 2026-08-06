@@ -1,10 +1,16 @@
 #!/bin/bash
 FULL=""
-if [ "$1" = "-f" ] || [ "$1" = "--full" ]
-then
-    FULL="--full"
+VERTICAL=""
+while [ "$1" = "-f" ] || [ "$1" = "--full" ] || [ "$1" = "-v" ] || [ "$1" = "--vertical" ]
+do
+    if [ "$1" = "-f" ] || [ "$1" = "--full" ]
+    then
+        FULL="--full"
+    else
+        VERTICAL="--vertical"
+    fi
     shift
-fi
+done
 
 if [ ! -f "$1" ]
 then
@@ -12,6 +18,6 @@ then
     exit 1
 fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-python3 "$SCRIPT_DIR/cwl_to_dot.py" $FULL "$1" > /tmp/workflow.dot
+python3 "$SCRIPT_DIR/cwl_to_dot.py" $FULL $VERTICAL "$1" > /tmp/workflow.dot
 dot -Tpng /tmp/workflow.dot -o "$1.png"
 rm /tmp/workflow.dot
